@@ -30,24 +30,25 @@ commands:
       - run: exit 0
       - slack/status:
           fail_only: true
-          mentions: ''
-          only_for_branches:
+          webhook: https://hooks.slack.com/services/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
 jobs:
   build:
     executor: core-executor
     steps:
       - build-pocket-image
+      - slack-notification
     working_directory: /go/src/github.com/pokt-network/pocket-core
   image_scan:
     executor: anchore/anchore_engine
     steps:
       - local_image_scan
+      - slack-notification
 orbs:
   anchore: anchore/anchore-engine@1.6.0
   slack: circleci/slack@3.4.0
 workflows:
-  pocket-workflow:
+  version: 2.1
+  build_and_scan:
     jobs:
-      build-pocket-image
-      local_image_scan
-      slack-notificacion
+      - build
+      - image_scan
